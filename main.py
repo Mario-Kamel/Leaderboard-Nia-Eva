@@ -6,7 +6,19 @@ import os
 import json
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from pathlib import Path
 
+import requests
+
+response = requests.get("https://sheets.googleapis.com/...", verify=False)
+
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent / ".env"
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path)
+except ImportError:
+    pass  # dotenv is optional; skip if not installed
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
@@ -19,10 +31,9 @@ service_account_info = json.loads(SERVICE_ACCOUNT_INFO)
 creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
 
 # Hardcoded spreadsheet ID and ranges
-GROUPS_SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
+SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
 GROUPS_RANGE = "Groups!A1:Z51"  # Adjust as needed
-INDIVIDUAL_SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
-INDIVIDUAL_RANGE = "فردي!A1:Z51"  # Adjust as needed
+INDIVIDUAL_RANGE = "Individual!A1:AP26"  # Adjust as needed
 
 app = FastAPI()
 
@@ -34,12 +45,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+os.environ["GOOGLE_API_USE_MTLS_ENDPOINT"] = "never"
+os.environ["GRPC_DNS_RESOLVER"] = "native"
 
-creds = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES
-)
-service = build("sheets", "v4", credentials=creds)
-sheet_api = service.spreadsheets()
+def get_sheet_api():
+    service = build("sheets", "v4", credentials=creds)
+    sheet_api = service.spreadsheets()
+    return sheet_api
 
 def safe_int(val):
     try:
@@ -49,6 +61,7 @@ def safe_int(val):
 
 @app.get("/api/groups")
 def get_groups():
+    sheet_api = get_sheet_api()
     result = (
         sheet_api.values()
         .get(spreadsheetId=SHEET_ID, range=GROUPS_RANGE, )
@@ -85,6 +98,7 @@ def get_groups():
 
 @app.get("/api/individual")
 def get_individual():
+    sheet_api = get_sheet_api()
     result = (
         sheet_api.values()
         .get(spreadsheetId=SHEET_ID, range=INDIVIDUAL_RANGE)
