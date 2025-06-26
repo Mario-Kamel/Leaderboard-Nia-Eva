@@ -8,10 +8,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 
-import requests
-
-response = requests.get("https://sheets.googleapis.com/...", verify=False)
-
 try:
     from dotenv import load_dotenv
     env_path = Path(__file__).parent / ".env"
