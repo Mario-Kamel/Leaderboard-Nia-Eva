@@ -19,7 +19,7 @@ service_account_info = json.loads(SERVICE_ACCOUNT_INFO)
 creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
 
 # Hardcoded spreadsheet ID and ranges
-GROUPS_SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
+SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
 GROUPS_RANGE = "Groups!A1:Z51"  # Adjust as needed
 INDIVIDUAL_SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
 INDIVIDUAL_RANGE = "فردي!A1:Z51"  # Adjust as needed
@@ -36,7 +36,7 @@ app.add_middleware(
 
 
 creds = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES
+    SERVICE_ACCOUNT_INFO, scopes=SCOPES
 )
 service = build("sheets", "v4", credentials=creds)
 sheet_api = service.spreadsheets()
