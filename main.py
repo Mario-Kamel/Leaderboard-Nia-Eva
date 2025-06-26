@@ -2,26 +2,38 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
+import os
+import json
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-SERVICE_ACCOUNT_FILE = 'keys.json'
+
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
+# Load service account info from environment variable
+SERVICE_ACCOUNT_INFO = os.environ.get("GOOGLE_SERVICE_ACCOUNT_INFO")
+if not SERVICE_ACCOUNT_INFO:
+    raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_INFO environment variable not set.")
+
+service_account_info = json.loads(SERVICE_ACCOUNT_INFO)
+creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
+
 # Hardcoded spreadsheet ID and ranges
-SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
-GROUPS_RANGE = "Groups!A1:X5"  # Adjust as needed
-INDIVIDUAL_RANGE = "Individual!A1:AP26"  # Adjust as needed
+GROUPS_SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
+GROUPS_RANGE = "Groups!A1:Z51"  # Adjust as needed
+INDIVIDUAL_SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
+INDIVIDUAL_RANGE = "فردي!A1:Z51"  # Adjust as needed
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],  # Change to your frontend URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES
