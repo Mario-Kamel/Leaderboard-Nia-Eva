@@ -29,7 +29,7 @@ creds = service_account.Credentials.from_service_account_info(service_account_in
 # Hardcoded spreadsheet ID and ranges
 SHEET_ID = "1jlwROtexTkyqorAo0HIR1nct1iMgmj2fpv89mdlvZ1U"
 GROUPS_RANGE = "Groups!A1:Z51"  # Adjust as needed
-INDIVIDUAL_RANGE = "Individual!A1:AP26"  # Adjust as needed
+INDIVIDUAL_RANGE = "Individual!A1:AP40"  # Adjust as needed
 
 app = FastAPI()
 
